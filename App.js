@@ -12,7 +12,20 @@ import {
 
 import QRCodeScanner from 'react-native-qrcode-scanner';
 
-const endpoint = 'http://exochain-luna:3000';
+import EText from './app/EText.js';
+import Card from './app/Card.js';
+
+class EButton extends Component {
+  render() {
+    return (
+      <TouchableOpacity style={styles.buttonTouchable} onPress={this.props.onPress}>
+        <EText style={styles.buttonText}>
+          {this.props.children}
+        </EText>
+      </TouchableOpacity>
+    );
+  }
+}
 
 class ScanScreen extends Component {
   onSuccess(e) {
@@ -31,32 +44,38 @@ class ScanScreen extends Component {
       this.setState({card: json})
     });
   }
-
-  renderContact(contact) {
-    return (
-      <>
-        <Text h1>
-          {contact.you.name}'s contact info
-        </Text>
-        <Text>
-          {contact.you.email}
-        </Text>
-        <Text>
-          {contact.you.phone}
-        </Text>
-        <Text>
-          {contact.you.address}
-        </Text>
-      </>
-    );
+  scanNew() {
+    this.setState({
+      card: null,
+    });
   }
+
+  showPrivate() {
+    this.setState({
+      private: !this.state.private,
+    });
+  }
+
   render() {
     if (this.state && this.state.card) {
+      let contacts = this.state.card.contacts;
+      const scanButton = (
+        <EButton onPress={this.scanNew.bind(this)}>
+          Scan another card
+        </EButton>
+      );
+      let privateButtonText = 'Show my private info';
+      if (this.state.private) {
+        privateButtonText = 'Show public info';
       }
       return (
-        <ScrollView>
-          // This is broken because I don't know how to do this correctly
-          {renderContact(this.state.you)}
+        <ScrollView style={styles.padded}>
+          {scanButton}
+          <Card card={this.state.card} private={this.state.private} />
+          <EButton onPress={this.showPrivate.bind(this)}>
+            {privateButtonText}
+          </EButton>
+          {scanButton}
         </ScrollView>
       );
     }
@@ -65,13 +84,13 @@ class ScanScreen extends Component {
         <QRCodeScanner
           onRead={this.onSuccess.bind(this)}
           topContent={
-            <Text style={styles.centerText}>
+            <EText style={styles.centerText}>
               Scan an ICE Card QR
-            </Text>
+            </EText>
           }
           bottomContent={
             <TouchableOpacity style={styles.buttonTouchable}>
-              <Text style={styles.buttonText}>OK. Got it!</Text>
+              <EText style={styles.buttonText}>OK. Got it!</EText>
             </TouchableOpacity>
           }
         />
@@ -87,6 +106,9 @@ const styles = StyleSheet.create({
     padding: 32,
     color: '#777',
   },
+  padded: {
+    padding: 24,
+  },
   textBold: {
     fontWeight: '500',
     color: '#000',
@@ -97,6 +119,11 @@ const styles = StyleSheet.create({
   },
   buttonTouchable: {
     padding: 16,
+  },
+  heading: {
+    color: '#111',
+    fontSize: 30,
+    paddingTop: 20,
   },
 });
 
