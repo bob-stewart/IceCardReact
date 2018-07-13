@@ -29,24 +29,15 @@ class EButton extends Component {
 
 class ScanScreen extends Component {
   onSuccess(e) {
-    let url = e.data + '.json';
-    fetch(url).then((response) => {
-      if (response.ok) {
-        return response.json();
-      }
-      else {
-        setState({
-          ok: false,
-        });
-      }
-    })
-    .then((json) => {
-      this.setState({card: json})
+    this.setState({
+      baseUrl: e.data,
+      doneScan: true,
     });
   }
   scanNew() {
     this.setState({
-      card: null,
+      baseUrl: null,
+      doneScan: false,
     });
   }
 
@@ -57,8 +48,7 @@ class ScanScreen extends Component {
   }
 
   render() {
-    if (this.state && this.state.card) {
-      let contacts = this.state.card.contacts;
+    if (this.state && this.state.doneScan) {
       const scanButton = (
         <EButton onPress={this.scanNew.bind(this)}>
           Scan another card
@@ -71,7 +61,7 @@ class ScanScreen extends Component {
       return (
         <ScrollView style={styles.padded}>
           {scanButton}
-          <Card card={this.state.card} private={this.state.private} />
+          <Card baseUrl={this.state.baseUrl} private={this.state.private} />
           <EButton onPress={this.showPrivate.bind(this)}>
             {privateButtonText}
           </EButton>
