@@ -8,17 +8,23 @@ import {
 } from 'react-native';
 
 import EText from './EText.js';
+import EInput from './EInput.js';
 
 class Contact extends Component {
   render() {
     let props = this.props;
     let contact = props.contact;
+    // Catch undefined fields as undefined rather than error
+    if (!contact) {
+      contact = {};
+    }
     let first;
-    if (props.name == 'you') {
+    const Field = props.input ? EInput : EText;
+    if (props.name == 'you' && !props.input) {
       first = <>
-        <EText style={styles.heading}>
+        <Field style={styles.heading}>
           {contact.name}'s contact info
-        </EText>
+        </Field>
       </>;
     }
     else {
@@ -26,23 +32,23 @@ class Contact extends Component {
         <EText style={styles.heading}>
           {props.name}
         </EText>
-        <EText>
+        <Field placeholder="Name">
           {contact.name}
-        </EText>
+        </Field>
       </>
     }
     return (
       <>
         {first}
-        <EText>
+        <Field placeholder="Email">
           {contact.email}
-        </EText>
-        <EText>
+        </Field>
+        <Field placeholder="Phone">
           {contact.phone}
-        </EText>
-        <EText>
+        </Field>
+        <Field placeholder="Address">
           {contact.address}
-        </EText>
+        </Field>
       </>
     );
   }

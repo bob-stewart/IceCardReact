@@ -50,9 +50,16 @@ class Card extends Component {
       if (this.state && this.state.password) {
         if (this.state.private) {
           let contacts = this.state.private.contacts;
+          // This lets further down the tree be undefined without erroring
+          if (!contacts) {
+            contacts = {};
+          }
           return (
             <>
-              <Contact contact={contacts.physician} name='Physician' />
+              <Contact contact={contacts.physician} name='Physician' input />
+              <Contact contact={contacts.attorney} name='Attorney' input />
+              <Contact contact={contacts.cpa} name='CPA' input />
+              <Contact contact={contacts.estate} name='Estate' input />
             </>
           );
         }
@@ -64,9 +71,7 @@ class Card extends Component {
       else {
         return (
           <>
-            <TextInput onSubmitEditing={this.setPassword.bind(this)}>
-              Password
-            </TextInput>
+            <TextInput onSubmitEditing={this.setPassword.bind(this)} placeholder="Password" />
           </>
         );
       }
