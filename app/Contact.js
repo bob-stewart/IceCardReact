@@ -11,6 +11,15 @@ import EText from './EText.js';
 import EInput from './EInput.js';
 
 class Contact extends Component {
+  constructor(props) {
+    super(props)
+    this.state = {};
+  }
+  EContactInput(props) {
+    return <EInput onChangeText={this.save.bind(this, props.field)} {...props}>
+      {props.children}
+    </EInput>;
+  }
   render() {
     let props = this.props;
     let contact = props.contact;
@@ -19,7 +28,7 @@ class Contact extends Component {
       contact = {};
     }
     let first;
-    const Field = props.input ? EInput : EText;
+    const Field = props.input ? this.EContactInput.bind(this) : EText;
     if (props.name == 'you' && !props.input) {
       first = <>
         <Field style={styles.heading}>
@@ -40,13 +49,13 @@ class Contact extends Component {
     return (
       <>
         {first}
-        <Field placeholder="Email">
+        <Field placeholder="Email" field="email">
           {contact.email}
         </Field>
-        <Field placeholder="Phone">
+        <Field placeholder="Phone" field="phone">
           {contact.phone}
         </Field>
-        <Field placeholder="Address">
+        <Field placeholder="Address" field="Address">
           {contact.address}
         </Field>
       </>

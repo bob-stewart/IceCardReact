@@ -45,6 +45,13 @@ class Card extends Component {
       password: e.nativeEvent.text,
     });
   }
+  save(group, field, value) {
+    this.setState({
+      contact: {
+        [field]: value,
+      },
+    });
+  }
   render() {
     if (this.props.private) {
       if (this.state && this.state.password) {
