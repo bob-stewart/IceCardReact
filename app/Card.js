@@ -148,13 +148,14 @@ class Card extends Component {
     else {
       if (this.state && this.state.card) {
         let contacts = this.state.card.contacts;
+        let props = this.props;
         return (
           <>
-            <Contact contact={contacts.you} name='you' />
-            <Contact contact={contacts.primary} name='Primary' save={this.save.bind(this, 'primary')} />
-            <Contact contact={contacts.alternative} name='Alternative' />
-            <Contact contact={contacts.contingency} name='Contingency' />
-            <Contact contact={contacts.emergency} name='Emergency' />
+            <Contact contact={contacts.you} name='You' save={this.save.bind(this, 'you')} input={props.input} />
+            <Contact contact={contacts.primary} name='Primary' save={this.save.bind(this, 'primary')} input={props.input} />
+            <Contact contact={contacts.alternative} name='Alternative' save={this.save.bind(this, 'alternative')} input={props.input} />
+            <Contact contact={contacts.contingency} name='Contingency' save={this.save.bind(this, 'contingency')} input={props.input} />
+            <Contact contact={contacts.emergency} name='Emergency' save={this.save.bind(this, 'emergency')} input={props.input} />
           </>
         );
       }

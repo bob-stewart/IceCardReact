@@ -14,7 +14,7 @@ $ react-native run-android
 ```
 
 The web server: You'll need one. VPN in to the Exochain network and open
-in your browser http://dev-ice.corp.exochain.com:3000/testing-monkey-12/print.
+in your browser http://dev-ice.corp.exochain.com:3000/testing-monkey-15/print.
 Open the app and scan the QR code. The password for this test card is
 `password`.
 
