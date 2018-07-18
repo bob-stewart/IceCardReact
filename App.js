@@ -6,6 +6,7 @@ import {
   AppRegistry,
   StyleSheet,
   Text,
+  TextInput,
   ScrollView,
   TouchableOpacity,
 } from 'react-native';
@@ -13,6 +14,7 @@ import {
 import QRCodeScanner from 'react-native-qrcode-scanner';
 
 import EText from './app/EText.js';
+import EInput from './app/EInput.js';
 import Card from './app/Card.js';
 
 class EButton extends Component {
@@ -61,7 +63,7 @@ class ScanScreen extends Component {
       return (
         <ScrollView style={styles.padded}>
           {scanButton}
-          <Card baseUrl={this.state.baseUrl} private={this.state.private} />
+          <Card key={this.state.baseUrl} baseUrl={this.state.baseUrl} private={this.state.private} />
           <EButton onPress={this.showPrivate.bind(this)}>
             {privateButtonText}
           </EButton>

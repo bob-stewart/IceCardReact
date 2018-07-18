@@ -46,15 +46,69 @@ class Card extends Component {
     });
   }
   save(group, field, value) {
-    this.setState({
-      private: {
-        contacts: {
-          [group]: {
-            [field]: value,
+    // This is absolutely ridiculous. Figure out a better way
+    this.setState((state) => {
+      let groupExpands = state.private.contacts ? state.private.contacts[group] : {};
+      return {
+        private: {
+          ...state.private,
+          contacts: {
+            ...state.private.contacts,
+            [group]: {
+              ...groupExpands,
+              [field]: value,
+            },
           },
         },
-      },
+      }
     });
+    // Don't just immediately update, that'd overload the server unnecessarily
+    // Start a timer, and if it runs out without a change, then update
+    let noType = 500;
+    if (this.state.timeout) {
+      clearTimeout(this.state.timeout);
+      console.log('clear', this.state.timeout);
+    }
+    let timeout = setTimeout(this.update.bind(this), noType);
+    console.log('make', timeout);
+    this.setState({timeout});
+  }
+  update() {
+    let data = this.asForm();
+    console.log(data);
+    let url = this.props.baseUrl + '/update-private';
+    fetch(url, {
+      method: 'POST',
+      headers: {
+        Accept: 'application/json',
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(data),
+    });
+  }
+  // Make:
+  // {
+  //   'a' : {
+  //     'b' : 'c'
+  //   }
+  // }
+  // into {'a-b': 'c'}
+  // NOT recursive, only works on two layers
+  collapse(what) {
+    let obj = {};
+    for (let key1 in what) {
+      let next = what[key1];
+      for (let key2 in next) {
+        let val = next[key2];
+        obj[key1 + '-' + key2] = val;
+      }
+    }
+    return obj;
+  }
+  asForm() {
+    let form = this.collapse(this.state.private.contacts);
+    form.password = this.state.password;
+    return form;
   }
   render() {
     if (this.props.private) {
@@ -67,10 +121,14 @@ class Card extends Component {
           }
           return (
             <>
-              <Contact key='p' contact={contacts.physician} name='Physician' save={this.save.bind(this, 'physician')} input />
-              <Contact key='a' contact={contacts.attorney} name='Attorney' save={this.save.bind(this)} input />
-              <Contact key='c' contact={contacts.cpa} name='CPA' save={this.save.bind(this)} input />
-              <Contact key='e' contact={contacts.estate} name='Estate' save={this.save.bind(this)} input />
+              <Contact key='p' contact={contacts.physician} name='Physician'
+                  save={this.save.bind(this, 'physician')} input />
+              <Contact key='a' contact={contacts.attorney} name='Attorney'
+                  save={this.save.bind(this, 'attorney')} input />
+              <Contact key='c' contact={contacts.cpa} name='CPA'
+                  save={this.save.bind(this, 'cpa')} input />
+              <Contact key='e' contact={contacts.estate} name='Estate'
+                  save={this.save.bind(this, 'estate')} input />
             </>
           );
         }
@@ -93,7 +151,7 @@ class Card extends Component {
         return (
           <>
             <Contact contact={contacts.you} name='you' />
-            <Contact contact={contacts.primary} name='Primary' />
+            <Contact contact={contacts.primary} name='Primary' save={this.save.bind(this, 'primary')} />
             <Contact contact={contacts.alternative} name='Alternative' />
             <Contact contact={contacts.contingency} name='Contingency' />
             <Contact contact={contacts.emergency} name='Emergency' />

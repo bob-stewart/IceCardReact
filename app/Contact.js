@@ -10,20 +10,25 @@ import {
 import EText from './EText.js';
 import EInput from './EInput.js';
 
-class Contact extends Component {
-  constructor(props) {
-    super(props)
-    this.state = {};
-  }
-  EContactInput(props) {
-    return <EInput key={props.field} onChangeText={this.wrapField(props.save, props.field)} {...props}>
-      {props.children}
-    </EInput>;
-  }
+
+class EContactInput extends Component {
   wrapField(f, field) {
     return (value) => {
       return f(field, value);
     }
+  }
+  render() {
+    let props = this.props;
+    return <EInput key={props.field} onChangeText={this.wrapField(props.save, props.field)} {...props}>
+      {props.children}
+    </EInput>;
+  }
+}
+
+class Contact extends Component {
+  constructor(props) {
+    super(props)
+    this.state = {};
   }
   render() {
     let props = this.props;
@@ -33,7 +38,7 @@ class Contact extends Component {
       contact = {};
     }
     let first;
-    const Field = props.input ? this.EContactInput.bind(this) : EText;
+    const Field = props.input ? EContactInput : EText;
     if (props.name == 'you' && !props.input) {
       first = <>
         <Field key={props.name + '-name'} style={styles.heading}>
@@ -46,7 +51,7 @@ class Contact extends Component {
         <EText key={props.name + '-heading'} style={styles.heading}>
           {props.name}
         </EText>
-        <Field key={props.name + '-name'} placeholder="Name" save={props.save}>
+        <Field key={props.name + '-name'} placeholder="Name" field="name" save={props.save}>
           {contact.name}
         </Field>
       </>
