@@ -9,37 +9,54 @@ import {
 } from 'react-native';
 
 import Contact from './Contact.js';
+import EButton from './EButton.js';
 
 // const endpoint = 'http://10.100.4.11:3000';
 
 class Card extends Component {
+  constructor(props) {
+    super(props)
+    this.state = {};
+  }
   load() {
-    let url = this.props.baseUrl + '.json';
-    fetch(url).then((response) => {
-      return response.json();
-    })
-    .then((json) => {
-      this.setState({card: json})
+    if (!this.state.isPrivate) {
+      // Load the public data
+      let url = this.props.baseUrl + '.json';
+      console.log(url);
+      fetch(url).then((response) => {
+        return response.json();
+      })
+      .then((json) => {
+        this.setState({card: json})
+      });
+    }
+    else {
+      // Load the private data with given password
+      let url = this.props.baseUrl + '/private.json';
+      fetch(url, {
+        method: 'POST',
+        headers: {
+          Accept: 'application/json',
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          password: this.state.password,
+        }),
+      }).then((response) => {
+        return response.json();
+      })
+      .then((json) => {
+        this.setState({private: json})
+      });
+    }
+  }
+
+  showPrivate() {
+    this.setState({
+      isPrivate: !this.state.isPrivate,
     });
   }
-  loadPrivate() {
-    let url = this.props.baseUrl + '/private.json';
-    fetch(url, {
-      method: 'POST',
-      headers: {
-        Accept: 'application/json',
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        password: this.state.password,
-      }),
-    }).then((response) => {
-      return response.json();
-    })
-    .then((json) => {
-      this.setState({private: json})
-    });
-  }
+
   setPassword(e) {
     this.setState({
       password: e.nativeEvent.text,
@@ -111,57 +128,67 @@ class Card extends Component {
     return form;
   }
   render() {
-    if (this.props.private) {
-      if (this.state && this.state.password) {
-        if (this.state.private) {
-          let contacts = this.state.private.contacts;
-          // This lets further down the tree be undefined without erroring
-          if (!contacts) {
-            contacts = {};
-          }
-          return (
-            <>
-              <Contact key='p' contact={contacts.physician} name='Physician'
-                  save={this.save.bind(this, 'physician')} input />
-              <Contact key='a' contact={contacts.attorney} name='Attorney'
-                  save={this.save.bind(this, 'attorney')} input />
-              <Contact key='c' contact={contacts.cpa} name='CPA'
-                  save={this.save.bind(this, 'cpa')} input />
-              <Contact key='e' contact={contacts.estate} name='Estate'
-                  save={this.save.bind(this, 'estate')} input />
-            </>
-          );
-        }
-        else {
-          this.loadPrivate();
-          return <Text>{this.state.password}</Text>;
-        }
-      }
-      else {
-        return (
-          <>
-            <TextInput onSubmitEditing={this.setPassword.bind(this)} placeholder="Password" />
-          </>
-        );
-      }
+    if (this.state.isPrivate && !this.state.password) {
+      return (
+        <>
+          <TextInput onSubmitEditing={this.setPassword.bind(this)} placeholder="Password" />
+        </>
+      );
     }
     else {
-      if (this.state && this.state.card) {
-        let contacts = this.state.card.contacts;
-        let props = this.props;
+      let data = this.state.isPrivate ? this.state.private : this.state.card;
+      if (data) {
+        let contacts = data.contacts;
+        // This lets further down the tree be undefined without erroring
+        if (!contacts) {
+          contacts = {};
+        }
+        let privateButtonText = 'Show my private info';
+        if (this.state.isPrivate) {
+          privateButtonText = 'Show public info';
+        }
+        let names;
+        if (this.state.isPrivate) {
+           names = [
+            'physician',
+            'attorney',
+            'cpa',
+            'estate',
+          ];
+        }
+        else {
+          names = [
+            'you',
+            'primary',
+            'alternative',
+            'contingency',
+            'emergency',
+          ];
+        }
+        let contactComponents = [];
+        for (let name of names) {
+          let humanName = name.charAt(0).toUpperCase() + name.slice(1);
+          contactComponents.push(
+            <Contact key={name} contact={contacts[name]} name={humanName}
+              save={this.save.bind(this, name)} input={this.props.input} />
+          );
+        }
+        let privateButton;
+        if (this.props.input) {
+          privateButton = <EButton onPress={this.showPrivate.bind(this)}>
+            {privateButtonText}
+          </EButton>;
+        }
         return (
           <>
-            <Contact contact={contacts.you} name='You' save={this.save.bind(this, 'you')} input={props.input} />
-            <Contact contact={contacts.primary} name='Primary' save={this.save.bind(this, 'primary')} input={props.input} />
-            <Contact contact={contacts.alternative} name='Alternative' save={this.save.bind(this, 'alternative')} input={props.input} />
-            <Contact contact={contacts.contingency} name='Contingency' save={this.save.bind(this, 'contingency')} input={props.input} />
-            <Contact contact={contacts.emergency} name='Emergency' save={this.save.bind(this, 'emergency')} input={props.input} />
+            {contactComponents}
+            {privateButton}
           </>
         );
       }
       else {
         this.load();
-        return <Text>Loading</Text>;
+        return <Text>Loading...</Text>;
       }
     }
   }

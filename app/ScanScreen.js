@@ -31,12 +31,6 @@ class ScanScreen extends Component {
     });
   }
 
-  showPrivate() {
-    this.setState({
-      private: !this.state.private,
-    });
-  }
-
   render() {
     if (this.state && this.state.doneScan) {
       const scanButton = (
@@ -44,18 +38,10 @@ class ScanScreen extends Component {
           Scan another card
         </EButton>
       );
-      let isPrivate = this.state ? this.state.private : false;
-      let privateButtonText = 'Show my private info';
-      if (isPrivate) {
-        privateButtonText = 'Show public info';
-      }
       return (
         <ScrollView style={styles.padded}>
           {scanButton}
-          <Card key={this.state.baseUrl} baseUrl={this.state.baseUrl} private={isPrivate} />
-          <EButton onPress={this.showPrivate.bind(this)}>
-            {privateButtonText}
-          </EButton>
+          <Card key={this.state.baseUrl} baseUrl={this.state.baseUrl} />
           {scanButton}
         </ScrollView>
       );
