@@ -16,9 +16,14 @@ class Contact extends Component {
     this.state = {};
   }
   EContactInput(props) {
-    return <EInput onChangeText={this.save.bind(this, props.field)} {...props}>
+    return <EInput key={props.field} onChangeText={this.wrapField(props.save, props.field)} {...props}>
       {props.children}
     </EInput>;
+  }
+  wrapField(f, field) {
+    return (value) => {
+      return f(field, value);
+    }
   }
   render() {
     let props = this.props;
@@ -31,17 +36,17 @@ class Contact extends Component {
     const Field = props.input ? this.EContactInput.bind(this) : EText;
     if (props.name == 'you' && !props.input) {
       first = <>
-        <Field style={styles.heading}>
+        <Field key={props.name + '-name'} style={styles.heading}>
           {contact.name}'s contact info
         </Field>
       </>;
     }
     else {
       first = <>
-        <EText style={styles.heading}>
+        <EText key={props.name + '-heading'} style={styles.heading}>
           {props.name}
         </EText>
-        <Field placeholder="Name">
+        <Field key={props.name + '-name'} placeholder="Name" save={props.save}>
           {contact.name}
         </Field>
       </>
@@ -49,13 +54,13 @@ class Contact extends Component {
     return (
       <>
         {first}
-        <Field placeholder="Email" field="email">
+        <Field key={props.name + '-email'} placeholder="Email" field="email" save={props.save}>
           {contact.email}
         </Field>
-        <Field placeholder="Phone" field="phone">
+        <Field key={props.name + '-phone'} placeholder="Phone" field="phone" save={props.save}>
           {contact.phone}
         </Field>
-        <Field placeholder="Address" field="Address">
+        <Field key={props.name + '-address'} placeholder="Address" field="address" save={props.save}>
           {contact.address}
         </Field>
       </>

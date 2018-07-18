@@ -47,8 +47,12 @@ class Card extends Component {
   }
   save(group, field, value) {
     this.setState({
-      contact: {
-        [field]: value,
+      private: {
+        contacts: {
+          [group]: {
+            [field]: value,
+          },
+        },
       },
     });
   }
@@ -63,10 +67,10 @@ class Card extends Component {
           }
           return (
             <>
-              <Contact contact={contacts.physician} name='Physician' input />
-              <Contact contact={contacts.attorney} name='Attorney' input />
-              <Contact contact={contacts.cpa} name='CPA' input />
-              <Contact contact={contacts.estate} name='Estate' input />
+              <Contact key='p' contact={contacts.physician} name='Physician' save={this.save.bind(this, 'physician')} input />
+              <Contact key='a' contact={contacts.attorney} name='Attorney' save={this.save.bind(this)} input />
+              <Contact key='c' contact={contacts.cpa} name='CPA' save={this.save.bind(this)} input />
+              <Contact key='e' contact={contacts.estate} name='Estate' save={this.save.bind(this)} input />
             </>
           );
         }
