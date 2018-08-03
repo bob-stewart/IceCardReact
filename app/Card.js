@@ -6,6 +6,7 @@ import {
   StyleSheet,
   TextInput,
   Text,
+  Linking,
 } from 'react-native';
 
 import ContactList from './ContactList.js';
@@ -196,6 +197,9 @@ class Card extends Component {
       return (
         <>
           <ContactList contacts={contacts} save={this.save.bind(this)} isPrivate={this.state.isPrivate} input={this.props.input} />
+          <EButton onPress={() => Linking.openURL(this.props.baseUrl + '/print')}>
+            Print your card
+          </EButton>
           {privateButton}
         </>
       );
