@@ -195,7 +195,7 @@ class Card extends Component {
       }
       return (
         <>
-          <ContactList contacts={contacts} save={this.save.bind(this)} isPrivate={this.state.isPrivate} input />
+          <ContactList contacts={contacts} save={this.save.bind(this)} isPrivate={this.state.isPrivate} input={this.props.input} />
           {privateButton}
         </>
       );
