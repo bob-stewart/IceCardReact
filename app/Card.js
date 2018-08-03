@@ -8,7 +8,7 @@ import {
   Text,
 } from 'react-native';
 
-import Contact from './Contact.js';
+import ContactList from './ContactList.js';
 import EButton from './EButton.js';
 
 class Card extends Component {
@@ -135,50 +135,33 @@ class Card extends Component {
     return form;
   }
   render() {
-    if (this.state.isPrivate && !this.state.password) {
-      return (
-        <>
-          <TextInput onSubmitEditing={this.setPassword.bind(this)} placeholder="Password" />
-        </>
-      );
+    if (this.state.isPrivate) {
+      if (this.state.card.secure) {
+        if (!this.state.password) {
+          return (
+            <>
+              <TextInput onSubmitEditing={this.setPassword.bind(this)} placeholder="Password" />
+            </>
+          );
+        }
+      }
+      else {
+        return (
+          <>
+            <Text>Secure this card!</Text>
+            <Input placeholder='New Password' />
+            <Input placeholder='Confirm Password' />
+          </>
+        );
+      }
     }
     else {
       let data = this.state.isPrivate ? this.state.private : this.state.card;
       if (data) {
         let contacts = data.contacts;
-        // This lets further down the tree be undefined without erroring
-        if (!contacts) {
-          contacts = {};
-        }
         let privateButtonText = 'Show my private info';
         if (this.state.isPrivate) {
           privateButtonText = 'Show public info';
-        }
-        let names;
-        if (this.state.isPrivate) {
-           names = [
-            'physician',
-            'attorney',
-            'cpa',
-            'estate',
-          ];
-        }
-        else {
-          names = [
-            'you',
-            'primary',
-            'alternative',
-            'contingency',
-            'emergency',
-          ];
-        }
-        let contactComponents = [];
-        for (let name of names) {
-          let humanName = name.charAt(0).toUpperCase() + name.slice(1);
-          contactComponents.push(
-            <Contact key={name} contact={contacts[name]} name={humanName}
-              save={this.save.bind(this, name)} input={this.props.input} />
-          );
         }
         let privateButton;
         if (this.props.input) {
@@ -188,7 +171,7 @@ class Card extends Component {
         }
         return (
           <>
-            {contactComponents}
+            <ContactList contacts={contacts} />
             {privateButton}
           </>
         );
