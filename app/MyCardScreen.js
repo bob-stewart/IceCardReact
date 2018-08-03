@@ -6,6 +6,7 @@ import {
   StyleSheet,
   Text,
   TextInput,
+  View,
   ScrollView,
   AsyncStorage,
 } from 'react-native';
@@ -37,7 +38,7 @@ class MyCardScreen extends Component {
   render() {
     if (this.state.id) {
       return (
-        <ScrollView style={styles.padded}>
+        <ScrollView contentContainerStyle={styles.padded}>
           <Card key={'mycard'} baseUrl={endpoint + '/' + this.state.id} input />
         </ScrollView>
       );
@@ -71,7 +72,7 @@ class MyCardScreen extends Component {
 
 const styles = StyleSheet.create({
   padded: {
-    padding: 24,
+    padding: 12,
   },
 });
 

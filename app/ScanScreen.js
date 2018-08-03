@@ -39,7 +39,7 @@ class ScanScreen extends Component {
         </EButton>
       );
       return (
-        <ScrollView style={styles.padded}>
+        <ScrollView contentContainerStyle={styles.padded}>
           {scanButton}
           <Card key={this.state.baseUrl} baseUrl={this.state.baseUrl} />
           {scanButton}
@@ -74,7 +74,7 @@ const styles = StyleSheet.create({
     color: '#777',
   },
   padded: {
-    padding: 24,
+    padding: 12,
   },
 });
 
