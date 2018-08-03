@@ -39,7 +39,7 @@ class Contact extends Component {
     }
     let first;
     const Field = props.input ? EContactInput : EText;
-    if (props.name == 'you' && !props.input) {
+    if (props.name == 'You' && !props.input) {
       first = <>
         <Field key={props.name + '-name'} style={styles.heading}>
           {contact.name}'s contact info
