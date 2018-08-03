@@ -7,20 +7,65 @@ import {
   Text,
   TextInput,
   ScrollView,
+  AsyncStorage,
 } from 'react-native';
 
 import EInput from './EInput.js';
 import EButton from './EButton.js';
 import Card from './Card.js';
 
+const endpoint = 'http://10.100.4.11:3000';
+
 class MyCardScreen extends Component {
+  constructor(props) {
+    super(props)
+    this.state = {};
+  }
+  makeCard() {
+    let url = endpoint + '/create.json';
+    fetch(url, {
+      method: 'POST'
+    })
+    .then((response) => response.json())
+    .then((json) => {
+      this.setState({
+        id: json.id,
+      });
+      AsyncStorage.setItem('@Exochain:myCard', json.id);
+    });
+  }
   render() {
-    let myCard = 'http://10.100.4.11:3000/testing-monkey-12';
-    return (
-      <ScrollView style={styles.padded}>
-        <Card key={myCard} baseUrl={myCard} input />
-      </ScrollView>
-    );
+    if (this.state.id) {
+      return (
+        <ScrollView style={styles.padded}>
+          <Card key={'mycard'} baseUrl={endpoint + '/' + this.state.id} input />
+        </ScrollView>
+      );
+    }
+    else {
+      if (this.state.makeCard) {
+        this.makeCard();
+        return <Text>Creating a card for you...</Text>;
+      }
+      else {
+        AsyncStorage.getItem('@Exochain:myCard').then((id) => {
+          if (id) {
+            console.log(id);
+            this.setState({
+              id: id,
+            });
+          }
+          else {
+            this.setState({
+              makeCard: true,
+            });
+          }
+        }).catch((err) => {
+          console.error(err);
+        });
+        return <Text>Loading...</Text>;
+      }
+    }
   }
 }
 

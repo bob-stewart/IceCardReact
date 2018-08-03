@@ -11,8 +11,6 @@ import {
 import Contact from './Contact.js';
 import EButton from './EButton.js';
 
-// const endpoint = 'http://10.100.4.11:3000';
-
 class Card extends Component {
   constructor(props) {
     super(props)
@@ -65,12 +63,13 @@ class Card extends Component {
   save(group, field, value) {
     // This is absolutely ridiculous. Figure out a better way
     this.setState((state) => {
-      let groupExpands = state.private.contacts ? state.private.contacts[group] : {};
+      let cardOrPrivate = state.isPrivate ? 'private': 'card'
+      let groupExpands = state[cardOrPrivate].contacts ? state[cardOrPrivate].contacts[group] : {};
       return {
-        private: {
-          ...state.private,
+        [cardOrPrivate]: {
+          ...state[cardOrPrivate],
           contacts: {
-            ...state.private.contacts,
+            ...state[cardOrPrivate].contacts,
             [group]: {
               ...groupExpands,
               [field]: value,
@@ -84,16 +83,21 @@ class Card extends Component {
     let noType = 500;
     if (this.state.timeout) {
       clearTimeout(this.state.timeout);
-      console.log('clear', this.state.timeout);
     }
     let timeout = setTimeout(this.update.bind(this), noType);
-    console.log('make', timeout);
     this.setState({timeout});
   }
   update() {
     let data = this.asForm();
     console.log(data);
-    let url = this.props.baseUrl + '/update-private';
+    let url = this.props.baseUrl;
+    if (this.state.isPrivate) {
+      url += '/update-private';
+    }
+    else {
+      url += '/update.json';
+    }
+    console.log(url);
     fetch(url, {
       method: 'POST',
       headers: {
@@ -123,8 +127,11 @@ class Card extends Component {
     return obj;
   }
   asForm() {
-    let form = this.collapse(this.state.private.contacts);
-    form.password = this.state.password;
+    let current = this.state.isPrivate ? this.state.private : this.state.card;
+    let form = this.collapse(current.contacts);
+    if (this.state.isPrivate) {
+      form.password = this.state.password;
+    }
     return form;
   }
   render() {
