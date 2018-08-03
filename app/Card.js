@@ -49,6 +49,27 @@ class Card extends Component {
     }
   }
 
+  secureCard() {
+    let url = this.props.baseUrl + '/make-secure'
+    fetch(url, {
+      method: 'POST',
+      headers: {
+        Accept: 'application/json',
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        password: this.state.password,
+      }),
+    });
+    // Set secure to something so that we will properly load private
+    this.setState({
+      card: {
+        ...this.state.card,
+        secure: true,
+      },
+    });
+  }
+
   showPrivate() {
     this.setState({
       isPrivate: !this.state.isPrivate,
@@ -144,42 +165,44 @@ class Card extends Component {
             </>
           );
         }
+        else {
+          // Pass through
+          // Render normally
+        }
       }
       else {
         return (
           <>
             <Text>Secure this card!</Text>
-            <Input placeholder='New Password' />
-            <Input placeholder='Confirm Password' />
+            <TextInput onSubmitEditing={this.setPassword.bind(this)} placeholder='New Password' />
+            <TextInput onSubmitEditing={this.secureCard.bind(this)} placeholder='Confirm Password' />
           </>
         );
       }
     }
+    let data = this.state.isPrivate ? this.state.private : this.state.card;
+    if (data) {
+      let contacts = data.contacts;
+      let privateButtonText = 'Show my private info';
+      if (this.state.isPrivate) {
+        privateButtonText = 'Show public info';
+      }
+      let privateButton;
+      if (this.props.input) {
+        privateButton = <EButton onPress={this.showPrivate.bind(this)}>
+          {privateButtonText}
+        </EButton>;
+      }
+      return (
+        <>
+          <ContactList contacts={contacts} save={this.save.bind(this)} isPrivate={this.state.isPrivate} input />
+          {privateButton}
+        </>
+      );
+    }
     else {
-      let data = this.state.isPrivate ? this.state.private : this.state.card;
-      if (data) {
-        let contacts = data.contacts;
-        let privateButtonText = 'Show my private info';
-        if (this.state.isPrivate) {
-          privateButtonText = 'Show public info';
-        }
-        let privateButton;
-        if (this.props.input) {
-          privateButton = <EButton onPress={this.showPrivate.bind(this)}>
-            {privateButtonText}
-          </EButton>;
-        }
-        return (
-          <>
-            <ContactList contacts={contacts} />
-            {privateButton}
-          </>
-        );
-      }
-      else {
-        this.load();
-        return <Text>Loading...</Text>;
-      }
+      this.load();
+      return <Text>Loading...</Text>;
     }
   }
 }

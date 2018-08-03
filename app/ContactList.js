@@ -5,10 +5,6 @@ import React, { Component } from 'react';
 import Contact from './Contact.js';
 
 class ContactList extends Component {
-  constructor(props) {
-    super(props)
-    this.state = {};
-  }
   render() {
     let contacts = this.props.contacts;
     // This lets further down the tree be undefined without erroring
@@ -16,7 +12,7 @@ class ContactList extends Component {
       contacts = {};
     }
     let names;
-    if (this.state.isPrivate) {
+    if (this.props.isPrivate) {
        names = [
         'physician',
         'attorney',
@@ -38,7 +34,8 @@ class ContactList extends Component {
       let humanName = name.charAt(0).toUpperCase() + name.slice(1);
       contactComponents.push(
         <Contact key={name} contact={contacts[name]} name={humanName}
-          save={this.save.bind(this, name)} input={this.props.input} />
+          save={(...args) => {this.props.save(name, ...args)}}
+          input={this.props.input} />
       );
     }
     return (
