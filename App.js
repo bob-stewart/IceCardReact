@@ -15,7 +15,7 @@ import MyCardScreen from './app/MyCardScreen.js';
 
 const App = createMaterialTopTabNavigator({
   Scan: { screen: ScanScreen },
-  "My Card": { screen: MyCardScreen },
+  'My Card': { screen: MyCardScreen },
 });
 
 AppRegistry.registerComponent('default', () => App);

@@ -31,6 +31,12 @@ class ScanScreen extends Component {
     });
   }
 
+  setMine() {
+    this.props.navigation.navigate('My Card', {
+      newBaseUrl: this.state.baseUrl
+    });
+  }
+
   render() {
     if (this.state && this.state.doneScan) {
       const scanButton = (
@@ -42,6 +48,7 @@ class ScanScreen extends Component {
         <ScrollView contentContainerStyle={styles.padded}>
           {scanButton}
           <Card key={this.state.baseUrl} baseUrl={this.state.baseUrl} />
+          <EButton onPress={this.setMine.bind(this)}>This is my card</EButton>
           {scanButton}
         </ScrollView>
       );

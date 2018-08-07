@@ -29,17 +29,24 @@ class MyCardScreen extends Component {
     })
     .then((response) => response.json())
     .then((json) => {
-      this.setState({
-        id: json.id,
-      });
-      AsyncStorage.setItem('@Exochain:myCard', json.id);
+      this.setUrl(endpoint + '/' + json.id);
     });
   }
+  setUrl(url, doState=true) {
+    if (doState) {
+      this.setState({
+        baseUrl: url,
+      });
+    }
+    AsyncStorage.setItem('@Exochain:myCard', url);
+  }
   render() {
-    if (this.state.id) {
+    let baseUrl = this.props.navigation.getParam('newBaseUrl', this.state.baseUrl);
+    if (baseUrl) {
+      this.setUrl(baseUrl, false); // Make sure the change is committed to memory
       return (
         <ScrollView contentContainerStyle={styles.padded}>
-          <Card key={'mycard'} baseUrl={endpoint + '/' + this.state.id} input />
+          <Card key={'mycard'} baseUrl={baseUrl} input />
         </ScrollView>
       );
     }
@@ -49,11 +56,11 @@ class MyCardScreen extends Component {
         return <Text>Creating a card for you...</Text>;
       }
       else {
-        AsyncStorage.getItem('@Exochain:myCard').then((id) => {
-          if (id) {
-            console.log(id);
+        AsyncStorage.getItem('@Exochain:myCard').then((url) => {
+          if (url) {
+            console.log(url);
             this.setState({
-              id: id,
+              baseUrl: url,
             });
           }
           else {
