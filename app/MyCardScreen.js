@@ -9,6 +9,7 @@ import {
   View,
   ScrollView,
   AsyncStorage,
+  Linking,
 } from 'react-native';
 
 import EInput from './EInput.js';
@@ -47,6 +48,9 @@ class MyCardScreen extends Component {
       return (
         <ScrollView contentContainerStyle={styles.padded}>
           <Card key={'mycard'} baseUrl={baseUrl} input />
+          <EButton onPress={() => Linking.openURL(baseUrl + '/print')}>
+            Print your card
+          </EButton>
         </ScrollView>
       );
     }
