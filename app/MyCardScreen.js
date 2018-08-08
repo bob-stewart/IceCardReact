@@ -41,6 +41,15 @@ class MyCardScreen extends Component {
     }
     AsyncStorage.setItem('@Exochain:myCard', url);
   }
+  resetUrl() {
+    this.setState({
+      makeCard: true,
+      baseUrl: null,
+    });
+    this.props.navigation.setParams({
+      newBaseUrl: null,
+    });
+  }
   render() {
     let baseUrl = this.props.navigation.getParam('newBaseUrl', this.state.baseUrl);
     if (baseUrl) {
@@ -50,6 +59,9 @@ class MyCardScreen extends Component {
           <Card key={'mycard'} baseUrl={baseUrl} input />
           <EButton onPress={() => Linking.openURL(baseUrl + '/print')}>
             Print your card
+          </EButton>
+          <EButton onPress={this.resetUrl.bind(this)}>
+            No, make a new card
           </EButton>
         </ScrollView>
       );
