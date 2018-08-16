@@ -21,8 +21,8 @@ const Home = createMaterialTopTabNavigator({
 });
 
 const App = createDrawerNavigator({
-	Home: { screen: Home },
-	Escrow: { screen: Escrow },
+  Home: { screen: Home },
+  Escrow: { screen: Escrow },
 });
 
 AppRegistry.registerComponent('default', () => App);

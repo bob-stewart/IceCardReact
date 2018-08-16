@@ -35,28 +35,30 @@ class MyCardScreen extends Component {
   }
   setUrl(url, doState=true) {
     if (doState) {
-      this.setState({
-        baseUrl: url,
-      });
+      this.props.navigation.setParams({myCardUrl: url});
+      this.setState({}); // Trigger re-render
     }
     AsyncStorage.setItem('@Exochain:myCard', url);
   }
   resetUrl() {
-    this.setState({
-      makeCard: true,
-      baseUrl: null,
-    });
     this.props.navigation.setParams({
       newBaseUrl: null,
+      myCardUrl: null,
+    });
+    this.setState({
+      makeCard: true,
     });
   }
   render() {
-    let baseUrl = this.props.navigation.getParam('newBaseUrl', this.state.baseUrl);
+    let baseUrl = this.props.navigation.getParam('newBaseUrl',
+      this.props.navigation.getParam('myCardUrl'));
+    let password = this.props.navigation.getParam('password');
     if (baseUrl) {
       this.setUrl(baseUrl, false); // Make sure the change is committed to memory
       return (
         <ScrollView contentContainerStyle={styles.padded}>
-          <Card key={'mycard'} baseUrl={baseUrl} input />
+          <Card key={'mycard'} baseUrl={baseUrl} navigation={this.props.navigation}
+            password={password} input />
           <EButton onPress={() => Linking.openURL(baseUrl + '/print')}>
             Print your card
           </EButton>
@@ -74,17 +76,16 @@ class MyCardScreen extends Component {
       else {
         AsyncStorage.getItem('@Exochain:myCard').then((url) => {
           if (url) {
-            console.log(url);
-            this.setState({
-              baseUrl: url,
-            });
+            this.props.navigation.setParams({myCardUrl: url});
+            this.setState({}); // Trigger re-render
           }
           else {
+            console.log('make teh card');
             this.setState({
               makeCard: true,
             });
           }
-        }).catch((err) => {
+        }, (err) => {
           console.error(err);
         });
         return <Text>Loading...</Text>;

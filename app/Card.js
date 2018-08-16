@@ -9,6 +9,7 @@ import {
 } from 'react-native';
 
 import ContactList from './ContactList.js';
+import Password from './Password.js';
 import EButton from './EButton.js';
 
 class Card extends Component {
@@ -31,6 +32,7 @@ class Card extends Component {
     else {
       // Load the private data with given password
       let url = this.props.baseUrl + '/private.json';
+      let password = this.props.password;
       fetch(url, {
         method: 'POST',
         headers: {
@@ -38,7 +40,7 @@ class Card extends Component {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          password: this.state.password,
+          password,
         }),
       }).then((response) => {
         return response.json();
@@ -51,6 +53,7 @@ class Card extends Component {
 
   secureCard() {
     let url = this.props.baseUrl + '/make-secure'
+    let password = this.props.password;
     fetch(url, {
       method: 'POST',
       headers: {
@@ -58,7 +61,7 @@ class Card extends Component {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        password: this.state.password,
+        password,
       }),
     });
     // Set secure to something so that we will properly load private
@@ -76,15 +79,10 @@ class Card extends Component {
     });
   }
 
-  setPassword(e) {
-    this.setState({
-      password: e.nativeEvent.text,
-    });
-  }
   save(group, field, value) {
     // This is absolutely ridiculous. Figure out a better way
     this.setState((state) => {
-      let cardOrPrivate = state.isPrivate ? 'private': 'card'
+      let cardOrPrivate = state.isPrivate ? 'private': 'card';
       let groupExpands = state[cardOrPrivate].contacts ? state[cardOrPrivate].contacts[group] : {};
       return {
         [cardOrPrivate]: {
@@ -150,20 +148,31 @@ class Card extends Component {
   asForm() {
     let current = this.state.isPrivate ? this.state.private : this.state.card;
     let form = this.collapse(current.contacts);
+    let password = this.props.password;
     if (this.state.isPrivate) {
-      form.password = this.state.password;
+      form.password = password;
     }
     return form;
   }
   render() {
+    let privateButtonText = 'Show my private info';
+    if (this.state.isPrivate) {
+      privateButtonText = 'Show public info';
+    }
+    let privateButton;
+    if (this.props.input) {
+      privateButton = <EButton onPress={this.showPrivate.bind(this)}>
+        {privateButtonText}
+      </EButton>;
+    }
     if (this.state.isPrivate) {
       if (this.state.card.secure) {
-        if (!this.state.password) {
-          return (
-            <>
-              <TextInput onSubmitEditing={this.setPassword.bind(this)} placeholder="Password" />
-            </>
-          );
+        let password = this.props.password;
+        if (!password) {
+          return <>
+            <Password navigation={this.props.navigation} />
+            {privateButton}
+          </>;
         }
         else {
           // Pass through
@@ -174,8 +183,9 @@ class Card extends Component {
         return (
           <>
             <Text>Secure this card!</Text>
-            <TextInput onSubmitEditing={this.setPassword.bind(this)} placeholder='New Password' />
+            <Password navigation={this.props.navigation} />
             <TextInput onSubmitEditing={this.secureCard.bind(this)} placeholder='Confirm Password' />
+            {privateButton}
           </>
         );
       }
@@ -183,16 +193,6 @@ class Card extends Component {
     let data = this.state.isPrivate ? this.state.private : this.state.card;
     if (data) {
       let contacts = data.contacts;
-      let privateButtonText = 'Show my private info';
-      if (this.state.isPrivate) {
-        privateButtonText = 'Show public info';
-      }
-      let privateButton;
-      if (this.props.input) {
-        privateButton = <EButton onPress={this.showPrivate.bind(this)}>
-          {privateButtonText}
-        </EButton>;
-      }
       return (
         <>
           <ContactList contacts={contacts} save={this.save.bind(this)} isPrivate={this.state.isPrivate} input={this.props.input} />
