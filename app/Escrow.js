@@ -5,6 +5,7 @@ import React, { Component } from 'react';
 import {
   StyleSheet,
   ScrollView,
+  AsyncStorage,
 } from 'react-native';
 
 import Password from './Password.js';
@@ -20,17 +21,23 @@ class Escrow extends Component {
     this.state = {};
   }
   completeEscrow() {
-    let url = 'TODO';
-    let password = 'TODO';
-    fetch(url, {
-      method: 'POST',
-      headers: {
-        Accept: 'application/json',
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        password,
-      }),
+    AsyncStorage.getItem('@Exochain:password').then(password => {
+      AsyncStorage.getItem('@Exochain:myCard').then(baseUrl => {
+        let url = baseUrl + '/escrow'
+        console.log(url);
+        fetch(url, {
+          method: 'POST',
+          headers: {
+            Accept: 'application/json',
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            password,
+          }),
+        }).then(res => {
+          this.setState(res);
+        });
+      });
     });
   }
   render() {
@@ -44,6 +51,7 @@ class Escrow extends Component {
         <EButton onPress={this.completeEscrow.bind(this)}>
           Escrow my card
         </EButton>
+        <EText>{this.state.res}</EText>
       </Password>
     </ScrollView>;
   }
