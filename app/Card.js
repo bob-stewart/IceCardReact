@@ -6,6 +6,7 @@ import {
   StyleSheet,
   TextInput,
   Text,
+  AsyncStorage,
 } from 'react-native';
 
 import ContactList from './ContactList.js';
@@ -32,7 +33,7 @@ class Card extends Component {
     else {
       // Load the private data with given password
       let url = this.props.baseUrl + '/private.json';
-      let password = this.props.password;
+      let password = this.state.password;
       fetch(url, {
         method: 'POST',
         headers: {
@@ -51,25 +52,41 @@ class Card extends Component {
     }
   }
 
+  getAndStorePassword() {
+    return new Promise((resolve, rej) => {
+      AsyncStorage.getItem('@Exochain:password').then(password => {
+        // hasUnsetPassword is true when the password HAS been gotten, but no
+        // password has ever been stored
+        let hasUnsetPassword = !password;
+        this.setState({
+          password,
+          hasUnsetPassword,
+        });
+        resolve(password);
+      });
+    });
+  }
+
   secureCard() {
     let url = this.props.baseUrl + '/make-secure'
-    let password = this.props.password;
-    fetch(url, {
-      method: 'POST',
-      headers: {
-        Accept: 'application/json',
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        password,
-      }),
-    });
-    // Set secure to something so that we will properly load private
-    this.setState({
-      card: {
-        ...this.state.card,
-        secure: true,
-      },
+    this.getAndStorePassword().then(password => {
+      fetch(url, {
+        method: 'POST',
+        headers: {
+          Accept: 'application/json',
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          password,
+        }),
+      });
+      // Set secure to something so that we will properly load private
+      this.setState({
+        card: {
+          ...this.state.card,
+          secure: true,
+        },
+      });
     });
   }
 
@@ -148,8 +165,8 @@ class Card extends Component {
   asForm() {
     let current = this.state.isPrivate ? this.state.private : this.state.card;
     let form = this.collapse(current.contacts);
-    let password = this.props.password;
     if (this.state.isPrivate) {
+      let password = this.state.password;
       form.password = password;
     }
     return form;
@@ -167,16 +184,22 @@ class Card extends Component {
     }
     if (this.state.isPrivate) {
       if (this.state.card.secure) {
-        let password = this.props.password;
-        if (!password) {
+        if (this.state.hasUnsetPassword) {
+          // We good, pass through, render normally
           return <>
             <Password navigation={this.props.navigation} />
             {privateButton}
           </>;
         }
         else {
-          // Pass through
-          // Render normally
+          if (!this.state.password) {
+            // Password ungotten but could be set
+            this.getAndStorePassword();
+            // Now render nermally
+          }
+          else {
+            // Pass through, enter normally
+          }
         }
       }
       else {

@@ -51,13 +51,11 @@ class MyCardScreen extends Component {
   render() {
     let baseUrl = this.props.navigation.getParam('newBaseUrl',
       this.state.baseUrl);
-    let password = this.props.navigation.getParam('password');
     if (baseUrl) {
       this.setUrl(baseUrl, false); // Make sure the change is committed to memory
       return (
         <ScrollView contentContainerStyle={styles.padded}>
-          <Card key={'mycard'} baseUrl={baseUrl} navigation={this.props.navigation}
-            password={password} input />
+          <Card key={'mycard'} baseUrl={baseUrl} navigation={this.props.navigation} input />
           <EButton onPress={() => Linking.openURL(baseUrl + '/print')}>
             Print your card
           </EButton>
@@ -73,7 +71,7 @@ class MyCardScreen extends Component {
         return <Text>Creating a card for you...</Text>;
       }
       else {
-        AsyncStorage.getItem('@Exochain:myCard').then((url) => {
+        AsyncStorage.getItem('@Exochain:myCard').then((baseUrl) => {
           if (baseUrl) {
             this.setState({baseUrl}); // Trigger re-render
           }
