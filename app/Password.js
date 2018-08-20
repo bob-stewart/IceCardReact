@@ -7,15 +7,21 @@ import {
   AsyncStorage,
 } from 'react-native';
 
-class Escrow extends Component {
+class Password extends Component {
+  constructor(props) {
+    super(props);
+    this.state = {};
+  }
   setPassword(e) {
     let password = e.nativeEvent.text;
     AsyncStorage.setItem('@Exochain:password', password);
-    this.props.navigation.setParams({password});
-    this.setState({}); // Trigger re-render
+    this.setState({}); // Trigger re-render? TODO check
   }
   render() {
-    let password = this.props.navigation.getParam('password');
+    let password = this.state.password;
+    if (!password) {
+      AsyncStorage.getItem('@Exochain:password').then(password => this.setState({password}));
+    }
     console.log(password);
     if (password && this.props.children) {
       return this.props.children;
@@ -26,5 +32,5 @@ class Escrow extends Component {
   }
 }
 
-module.exports = Escrow;
+module.exports = Password;
 

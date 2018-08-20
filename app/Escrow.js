@@ -40,7 +40,7 @@ class Escrow extends Component {
       <EText>Make shared contingency plans</EText>
       <EText>Please someone other than me write this copy</EText>
       <EText>More</EText>
-      <Password navigation={this.props.navigation}>
+      <Password>
         <EButton onPress={this.completeEscrow.bind(this)}>
           Escrow my card
         </EButton>

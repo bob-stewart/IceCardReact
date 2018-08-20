@@ -35,23 +35,22 @@ class MyCardScreen extends Component {
   }
   setUrl(url, doState=true) {
     if (doState) {
-      this.props.navigation.setParams({myCardUrl: url});
-      this.setState({}); // Trigger re-render
+      this.setState({baseUrl: url});
     }
     AsyncStorage.setItem('@Exochain:myCard', url);
   }
   resetUrl() {
     this.props.navigation.setParams({
       newBaseUrl: null,
-      myCardUrl: null,
     });
     this.setState({
       makeCard: true,
+      baseUrl: null,
     });
   }
   render() {
     let baseUrl = this.props.navigation.getParam('newBaseUrl',
-      this.props.navigation.getParam('myCardUrl'));
+      this.state.baseUrl);
     let password = this.props.navigation.getParam('password');
     if (baseUrl) {
       this.setUrl(baseUrl, false); // Make sure the change is committed to memory
@@ -75,9 +74,8 @@ class MyCardScreen extends Component {
       }
       else {
         AsyncStorage.getItem('@Exochain:myCard').then((url) => {
-          if (url) {
-            this.props.navigation.setParams({myCardUrl: url});
-            this.setState({}); // Trigger re-render
+          if (baseUrl) {
+            this.setState({baseUrl}); // Trigger re-render
           }
           else {
             console.log('make teh card');
