@@ -16,7 +16,12 @@ import EInput from './EInput.js';
 import EButton from './EButton.js';
 import Card from './Card.js';
 
-const endpoint = 'http://10.100.4.11:3000';
+// Work, ice-node
+// const endpoint = 'http://10.100.4.11:3000';
+// Home, ice-spring
+// const endpoint = 'http://192.168.1.113:8080';
+// Live server
+const endpoint = 'http://dev-ice.corp.exochain.com:3000';
 
 class MyCardScreen extends Component {
   constructor(props) {
