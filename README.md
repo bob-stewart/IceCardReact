@@ -10,6 +10,7 @@ Then it's as simple as this:
 
 ```
 $ npm install -g react-native-cli
+$ npm i
 $ react-native run-android
 ```
 
